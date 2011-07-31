@@ -144,9 +144,9 @@ class Dahius_VirtualPos_Adapter_Posnet extends Dahius_VirtualPos_Adapter_Abstrac
                     <mid>{$this->_parameters->getPath("mid")}</mid>
                     <tid>{$this->_parameters->getPath("tid")}</tid>
                     <{$this->_formatTransactionType($request->isThreeDSecure, "Auth")}>
-                        <currencyCode>{$this->_formatCurrency()}</currencyCode>
+                        <currencyCode>{$this->_formatCurrency($request->currency)}</currencyCode>
                         <ccno>{$request->cardNumber}</ccno>
-                        <expDate>{$this->_formatExpires($request->expireMonth, $request->expireYearShort)}</expDate>
+                        <expDate>{$this->_formatExpires($request->expireMonth, $request->expireYear)}</expDate>
                         <cvc>{$request->cvc}</cvc>
                         <amount>{$this->_formatAmount($request->amount)}</amount>
                         <installment>{$this->_formatInstallment($request->installment)}</installment>
@@ -313,8 +313,8 @@ class Dahius_VirtualPos_Adapter_Posnet extends Dahius_VirtualPos_Adapter_Abstrac
                                  "&VirtualPosAdapterName={$this->_name}".
                                  "&openANewWindow=0";
 
-                    $answer = $this->_post->($this->_parameters->getPath("host/authorization"), $request);
-
+                    $answer = $this->_post($this->_parameters->getPath("host/authorization"), $request);
+                    
                     if ($answer["succeed"]) {
                         $form = $answer["response"];
                         $form = str_replace("var is_firefox","var is_firefox=false;//var is_firefox'", $form);
@@ -421,7 +421,7 @@ class Dahius_VirtualPos_Adapter_Posnet extends Dahius_VirtualPos_Adapter_Abstrac
         return $this->_parser($answer);
     }
 
-    private function _formatOrderId($orderID, $hasTreeDSecure=false)
+    private function _formatOrderId($orderID, $hasThreeDSecure=false)
     {    
         return substr(str_pad($orderID, 24, "0", STR_PAD_LEFT), 0, (($hasThreeDSecure) ? 20 : 24));
     }
@@ -430,6 +430,20 @@ class Dahius_VirtualPos_Adapter_Posnet extends Dahius_VirtualPos_Adapter_Abstrac
     {
         return sprintf("%02s/%04s", $month, $year);
     }
+    
+    /**
+     * worldcard için format 0912 olmalı. kısa yıl diye bir property olamaz.
+     * Onun yerine orjinal yılın son 2 hanesini alıyoruz
+     * @param type $month
+     * @param type $year
+     * @return type 
+     */
+    private function _formatExpires($month, $year)
+    {
+        $shortYear = substr($year, -2);
+        return sprintf("%02s%02s", $shortYear, $month);
+    }    
+    
 
     private function _formatAmount($amount)
     {
