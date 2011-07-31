@@ -37,8 +37,12 @@ class Dahius_VirtualPos
 
     public function __construct($config)
     {
-        $file = new Joy_File($config);
-        $this->_adapters = $file->getReader()->toArray();
+        if (is_array($config)){
+            $this->_adapters = $config;
+        } else {
+            $file = new Joy_File($config);
+            $this->_adapters = $file->getReader()->toArray();
+        }
     }
 
     /**
