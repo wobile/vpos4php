@@ -1,17 +1,15 @@
 bonus:
-    adapter: Dahius_VirtualPos_Adapter_CC5
+    adapter: Dahius_VirtualPos_Adapter_GVP
     parameters:
         host:
-            bank: https://ccpos.garanti.com.tr/servlet/cc5ApiServer
+            bank: https://sanalposprov.garanti.com.tr/VPServlet
             authentication: https://ccpos.garanti.com.tr/servlet/gar3Dgate
             callback: https://example.com/callback/for/3DSecure
-        username: garanti_user
-        password: garanti_pass
-        store_type: 3d
-        working_mode: P
-        client_id: 12345678
-        store_key: 123456
-        valid_md_status: [1, 2, 3, 4]
+        terminal_id: 123456
+        provision_password: password
+        merchant_id: 999999
+        user_id: 908799
+        prov_user_id: PROVAUT
 
 axess:
     adapter: Dahius_VirtualPos_Adapter_CC5
