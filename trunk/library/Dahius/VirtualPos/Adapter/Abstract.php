@@ -221,17 +221,32 @@ abstract class Dahius_VirtualPos_Adapter_Abstract implements Dahius_VirtualPos_I
         curl_setopt($ch, CURLOPT_TIMEOUT, 100);
         $response = curl_exec($ch);
 
-        if (curl_errno($ch)) { 
-            $message = curl_error($ch); 
-        }
-        else { 
-            curl_close($ch); 
-            $message = "";
-        }
+        if ($this->_name == 'bonus') {
+            $xml_parser = xml_parser_create();
+            xml_parse_into_struct($xml_parser,$response,$vals,$index);
+            xml_parser_free($xml_parser);
 
-        return array("succeed"=>(bool)!$message, 
-                     "message"=>$message, 
-                     "response"=>$response);
+            $strReasonCodeValue = $vals[$index['REASONCODE'][0]]['value'];
+
+            $succeed = ($strReasonCodeValue == "00") ? 1 : 0;
+            $message = $vals[$index['ERRORMSG'][0]]['value'];
+
+            return array("succeed"=>(bool)!$message, 
+                         "message"=>$message, 
+                         "response"=>$response);
+        } else {        
+            if (curl_errno($ch)) { 
+                $message = curl_error($ch); 
+            }
+            else { 
+                curl_close($ch); 
+                $message = "";
+            }
+
+            return array("succeed"=>(bool)!$message, 
+                         "message"=>$message, 
+                         "response"=>$response);
+        }
     }
 
     /**
